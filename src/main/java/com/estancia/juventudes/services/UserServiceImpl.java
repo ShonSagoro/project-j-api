@@ -101,10 +101,11 @@ public class UserServiceImpl implements IUserService {
                 .gender(converter.convertToDatabaseColumn(user.getGender()))
                 .firstLastname(user.getFirstLastname())
                 .secondLastname(user.getSecondLastname())
-                .birthday(user.getBirthday())
+                .dateOfBirth(user.getDateOfBirth())
                 .address(user.getAddress())
                 .age(user.getAge())
                 .numberPhone(user.getNumberPhone())
+                .rol(user.getRol())
                 .build();
     }
 
@@ -117,10 +118,11 @@ public class UserServiceImpl implements IUserService {
         user.setGender(converter.convertToEntityAttribute(request.getGender()));
         user.setFirstLastname(request.getFirstLastname());
         user.setSecondLastname(request.getSecondLastname());
-        user.setBirthday(request.getBirthday());
+        user.setDateOfBirth(request.getDateOfBirth());
         user.setAddress(request.getAddress());
         user.setAge(request.getAge());
         user.setNumberPhone(request.getNumberPhone());
+        user.setRol(request.getRol());
         return user;
     }
 
@@ -132,10 +134,11 @@ public class UserServiceImpl implements IUserService {
         user.setGender(converter.convertToEntityAttribute(update.getGender()));
         user.setFirstLastname(update.getFirstLastname());
         user.setSecondLastname(update.getSecondLastname());
-        user.setBirthday(update.getBirthday());
+        user.setDateOfBirth(update.getDateOfBirth());
         user.setAddress(update.getAddress());
         user.setAge(update.getAge());
         user.setNumberPhone(update.getNumberPhone());
+        user.setRol(update.getRol());
         return user;
     }
 
