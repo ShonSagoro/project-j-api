@@ -28,23 +28,18 @@ public class User {
     @Column(nullable = false)
     private GenderType gender;
 
-
     private String firstLastname;
-    
 
     private String secondLastname;
-    
 
-    private String birthday;
-
+    private String dateOfBirth;
 
     private String address;
 
-
     private Short age;
-
 
     private String numberPhone;
 
+    private String rol;
 
 }

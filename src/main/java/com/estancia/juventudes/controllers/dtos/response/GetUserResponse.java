@@ -21,7 +21,7 @@ public class GetUserResponse {
 
     private  String secondLastname;
 
-    private String birthday;
+    private String dateOfBirth;
 
     private String address;
 
@@ -29,6 +29,7 @@ public class GetUserResponse {
 
     private String numberPhone;
 
+    private String rol;
 }
 
 

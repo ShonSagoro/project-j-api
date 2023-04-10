@@ -26,12 +26,14 @@ public class CreateUserRequest {
 
     private  String secondLastname;
 
-    private String birthday;
+    private String dateOfBirth;
 
     private String address;
 
     private Short age;
 
     private String numberPhone;
+
+    private String rol;
 
 }
