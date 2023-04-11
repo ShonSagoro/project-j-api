@@ -60,6 +60,11 @@ public class GuardianServiceImpl  implements IGuardianService {
         repository.deleteById(id);
     }
 
+    @Override
+    public Guardian getById(Long id) {
+        return repository.findById(id).orElseThrow(RuntimeException::new);
+    }
+
     private Guardian update(Guardian guardian, UpdateGuardianRequest request){
         guardian.setName(request.getName());
         guardian.setLastName(request.getLastName());

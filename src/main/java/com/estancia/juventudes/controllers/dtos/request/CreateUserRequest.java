@@ -36,4 +36,7 @@ public class CreateUserRequest {
 
     private String rol;
 
+    //for relationship
+    private Long guardianId;
+
 }

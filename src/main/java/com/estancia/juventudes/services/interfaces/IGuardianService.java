@@ -4,6 +4,7 @@ import com.estancia.juventudes.controllers.dtos.request.CreateGuardianRequest;
 import com.estancia.juventudes.controllers.dtos.request.UpdateGuardianRequest;
 import com.estancia.juventudes.controllers.dtos.request.UpdateUserRequest;
 import com.estancia.juventudes.controllers.dtos.response.BaseResponse;
+import com.estancia.juventudes.entities.Guardian;
 
 public interface IGuardianService {
 
@@ -14,6 +15,8 @@ public interface IGuardianService {
     BaseResponse update(Long id, UpdateGuardianRequest request);
 
     void delete (Long id);
+
+    Guardian getById(Long id);
 
 
 }
