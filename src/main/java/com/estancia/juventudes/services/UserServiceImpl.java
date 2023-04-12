@@ -8,8 +8,8 @@ import com.estancia.juventudes.controllers.dtos.response.GetUserResponse;
 import com.estancia.juventudes.entities.Guardian;
 import com.estancia.juventudes.entities.User;
 import com.estancia.juventudes.entities.enums.converters.GenderTypeConverter;
-import com.estancia.juventudes.repositories.IGuardianRepository;
 import com.estancia.juventudes.repositories.IUserRepository;
+import com.estancia.juventudes.services.interfaces.IGuardianService;
 import com.estancia.juventudes.services.interfaces.IUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,13 +23,13 @@ import java.util.stream.Collectors;
 @Repository
 public class UserServiceImpl implements IUserService {
 
-    private final IGuardianRepository guardianRepository;
+    private final IGuardianService guardianService;
     private final IUserRepository repository;
 
     private final GenderTypeConverter converter;
 
-    public UserServiceImpl(IGuardianRepository guardianRepository, IUserRepository repository, GenderTypeConverter converter) {
-        this.guardianRepository = guardianRepository;
+    public UserServiceImpl( IGuardianService guardianService, IUserRepository repository, GenderTypeConverter converter) {
+        this.guardianService = guardianService;
         this.repository = repository;
         this.converter = converter;
     }
@@ -123,7 +123,7 @@ public class UserServiceImpl implements IUserService {
 
     private User from(CreateUserRequest request){
         User user = new User();
-        Guardian guardian = guardianRepository.findById(request.getGuardianId()).orElseThrow(RuntimeException::new);
+        Guardian guardian = guardianService.getById(request.getGuardianId());
         user.setEmail(request.getEmail());
         user.setName(request.getName());
         user.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
@@ -142,7 +142,7 @@ public class UserServiceImpl implements IUserService {
 
 
     private User update(User user, UpdateUserRequest update){
-        Guardian guardian = guardianRepository.findById(update.getGuardianId()).orElseThrow(RuntimeException::new);
+        Guardian guardian = guardianService.getById(update.getGuardianId());
         user.setName(update.getName());
         user.setEmail(update.getEmail());
         user.setPassword(new BCryptPasswordEncoder().encode(update.getPassword()));
