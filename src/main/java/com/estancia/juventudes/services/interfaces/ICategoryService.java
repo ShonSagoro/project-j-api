@@ -8,7 +8,7 @@ public interface ICategoryService {
     BaseResponse get(Long id);
     BaseResponse create(CreateCategoryRequest request);
 
-    BaseResponse update(UpdateCategoryRequest request, Long idCategory);
+    BaseResponse update(UpdateCategoryRequest request, Long id);
 
     BaseResponse getAll();
 
