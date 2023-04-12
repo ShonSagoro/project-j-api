@@ -42,4 +42,7 @@ public class User {
 
     private String rol;
 
+    @ManyToOne
+    private Guardian guardian;
+
 }

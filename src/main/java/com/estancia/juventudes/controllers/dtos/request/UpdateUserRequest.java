@@ -27,4 +27,7 @@ public class UpdateUserRequest {
     private String numberPhone;
 
     private String rol;
+
+    //for relationship
+    private Long guardianId;
 }
