@@ -7,7 +7,6 @@ import com.estancia.juventudes.controllers.dtos.response.GetCompanyResponse;
 import com.estancia.juventudes.entities.Company;
 import com.estancia.juventudes.repositories.ICompanyRepository;
 import com.estancia.juventudes.services.interfaces.ICompanyService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,8 +15,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class CompanyServiceImpl implements ICompanyService {
 
-    @Autowired
-    private ICompanyRepository repository;
+    private final ICompanyRepository repository;
+
+    public CompanyServiceImpl(ICompanyRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public BaseResponse get(Long id) {
@@ -42,7 +44,7 @@ public class CompanyServiceImpl implements ICompanyService {
 
     @Override
     public BaseResponse update(UpdateCompanyRequest request, Long id) {
-        Company company = repository.findById(id).orElseThrow();
+        Company company = repository.findById(id).orElseThrow(RuntimeException::new);
         company = update(company, request);
         GetCompanyResponse response = from(company);
         return BaseResponse.builder()
@@ -64,7 +66,7 @@ public class CompanyServiceImpl implements ICompanyService {
 
 
     private GetCompanyResponse from(Long id){
-        Company company = repository.findById(id).orElseThrow();
+        Company company = repository.findById(id).orElseThrow(RuntimeException::new);
         return from(company);
     }
 
