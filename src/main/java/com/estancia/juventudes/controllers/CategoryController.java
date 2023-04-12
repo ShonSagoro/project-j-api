@@ -18,7 +18,7 @@ public class CategoryController {
         this.service = service;
     }
 
-    @GetMapping("get/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<BaseResponse> get(@PathVariable Long id){
         BaseResponse response = service.get(id);
         return new ResponseEntity<>(response, response.getHttpStatus());
@@ -36,14 +36,14 @@ public class CategoryController {
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
-    @PutMapping("/{idUser}")
+    @PutMapping("{id}")
     public ResponseEntity<BaseResponse> update(@RequestBody UpdateCategoryRequest request,
-                                               @PathVariable Long idUser){
-        BaseResponse response = service.update(request, idUser);
+                                               @PathVariable Long id){
+        BaseResponse response = service.update(request, id);
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
-    @DeleteMapping("{idUser}")
+    @DeleteMapping("{id}")
     public void delete(@PathVariable Long id){
         service.delete(id);
     }
