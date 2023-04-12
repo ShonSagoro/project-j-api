@@ -11,14 +11,14 @@ import com.estancia.juventudes.repositories.IUserRepository;
 import com.estancia.juventudes.services.interfaces.IUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Repository
+@Service
 public class UserServiceImpl implements IUserService {
 
     private final IUserRepository repository;
