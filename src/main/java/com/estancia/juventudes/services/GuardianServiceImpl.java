@@ -1,23 +1,23 @@
 package com.estancia.juventudes.services;
 
-import com.estancia.juventudes.controllers.advices.exceptions.NotFoundException;
 import com.estancia.juventudes.controllers.dtos.request.CreateGuardianRequest;
 import com.estancia.juventudes.controllers.dtos.request.UpdateGuardianRequest;
-import com.estancia.juventudes.controllers.dtos.request.UpdateUserRequest;
 import com.estancia.juventudes.controllers.dtos.response.BaseResponse;
 import com.estancia.juventudes.controllers.dtos.response.GetGuardianResponse;
 import com.estancia.juventudes.entities.Guardian;
 import com.estancia.juventudes.repositories.IGuardianRepository;
 import com.estancia.juventudes.services.interfaces.IGuardianService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GuardianServiceImpl  implements IGuardianService {
 
-    @Autowired
-    private IGuardianRepository repository;
+    private final IGuardianRepository repository;
+
+    public GuardianServiceImpl(IGuardianRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public BaseResponse get(Long id) {
