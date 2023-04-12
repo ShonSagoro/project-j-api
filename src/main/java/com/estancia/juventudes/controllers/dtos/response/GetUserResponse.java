@@ -30,6 +30,9 @@ public class GetUserResponse {
     private String numberPhone;
 
     private String rol;
+
+    //for relationship
+    private Long guardianId;
 }
 
 
