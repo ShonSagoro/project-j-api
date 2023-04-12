@@ -11,7 +11,6 @@ import com.estancia.juventudes.entities.enums.converters.GenderTypeConverter;
 import com.estancia.juventudes.repositories.IGuardianRepository;
 import com.estancia.juventudes.repositories.IUserRepository;
 import com.estancia.juventudes.services.interfaces.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
@@ -22,13 +21,14 @@ import java.util.stream.Collectors;
 
 @Repository
 public class UserServiceImpl implements IUserService {
-    @Autowired
-    private IGuardianRepository guardianRepository;
+
+    private final IGuardianRepository guardianRepository;
     private final IUserRepository repository;
 
     private final GenderTypeConverter converter;
 
-    public UserServiceImpl(IUserRepository repository, GenderTypeConverter converter) {
+    public UserServiceImpl(IGuardianRepository guardianRepository, IUserRepository repository, GenderTypeConverter converter) {
+        this.guardianRepository = guardianRepository;
         this.repository = repository;
         this.converter = converter;
     }
