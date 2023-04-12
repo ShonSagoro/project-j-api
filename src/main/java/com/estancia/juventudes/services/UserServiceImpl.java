@@ -5,9 +5,11 @@ import com.estancia.juventudes.controllers.dtos.request.CreateUserRequest;
 import com.estancia.juventudes.controllers.dtos.request.UpdateUserRequest;
 import com.estancia.juventudes.controllers.dtos.response.BaseResponse;
 import com.estancia.juventudes.controllers.dtos.response.GetUserResponse;
+import com.estancia.juventudes.entities.Guardian;
 import com.estancia.juventudes.entities.User;
 import com.estancia.juventudes.entities.enums.converters.GenderTypeConverter;
 import com.estancia.juventudes.repositories.IUserRepository;
+import com.estancia.juventudes.services.interfaces.IGuardianService;
 import com.estancia.juventudes.services.interfaces.IUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,10 +23,13 @@ import java.util.stream.Collectors;
 @Repository
 public class UserServiceImpl implements IUserService {
 
+    private final IGuardianService guardianService;
     private final IUserRepository repository;
+
     private final GenderTypeConverter converter;
 
-    public UserServiceImpl(IUserRepository repository, GenderTypeConverter converter) {
+    public UserServiceImpl( IGuardianService guardianService, IUserRepository repository, GenderTypeConverter converter) {
+        this.guardianService = guardianService;
         this.repository = repository;
         this.converter = converter;
     }
@@ -92,8 +97,13 @@ public class UserServiceImpl implements IUserService {
                 .orElseThrow(RuntimeException::new);
     }
 
+    @Override
+    public User getById(Long id) {
+        return repository.findById(id).orElseThrow(RuntimeException::new);
+    }
 
     private GetUserResponse from(User user){
+        Guardian guardian = user.getGuardian();
         return GetUserResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
@@ -107,11 +117,13 @@ public class UserServiceImpl implements IUserService {
                 .age(user.getAge())
                 .numberPhone(user.getNumberPhone())
                 .rol(user.getRol())
+                .guardianId(guardian.getId())
                 .build();
     }
 
     private User from(CreateUserRequest request){
         User user = new User();
+        Guardian guardian = guardianService.getById(request.getGuardianId());
         user.setEmail(request.getEmail());
         user.setName(request.getName());
         user.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
@@ -124,11 +136,13 @@ public class UserServiceImpl implements IUserService {
         user.setAge(request.getAge());
         user.setNumberPhone(request.getNumberPhone());
         user.setRol(request.getRol());
+        user.setGuardian(guardian);
         return user;
     }
 
 
     private User update(User user, UpdateUserRequest update){
+        Guardian guardian = guardianService.getById(update.getGuardianId());
         user.setName(update.getName());
         user.setEmail(update.getEmail());
         user.setPassword(new BCryptPasswordEncoder().encode(update.getPassword()));
@@ -140,6 +154,7 @@ public class UserServiceImpl implements IUserService {
         user.setAge(update.getAge());
         user.setNumberPhone(update.getNumberPhone());
         user.setRol(update.getRol());
+        user.setGuardian(guardian);
         return user;
     }
 
