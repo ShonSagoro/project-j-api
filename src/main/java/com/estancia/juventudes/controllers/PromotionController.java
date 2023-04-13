@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("promotion")
 public class PromotionController {
-    @Autowired
+
     private final IPromotionService service;
 
     public PromotionController(IPromotionService service) {
