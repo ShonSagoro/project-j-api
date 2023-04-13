@@ -24,6 +24,14 @@ public class CategoryController {
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
+    @GetMapping("{id}/companies")
+    public ResponseEntity<BaseResponse> getCompanies(@PathVariable Long id){
+        BaseResponse response = service.getAllCompanies(id);
+        return new ResponseEntity<>(response, response.getHttpStatus());
+    }
+
+
+
     @GetMapping
     public ResponseEntity<BaseResponse> getAll(){
         BaseResponse response = service.getAll();

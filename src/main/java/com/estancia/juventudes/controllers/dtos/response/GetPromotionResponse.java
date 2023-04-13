@@ -4,11 +4,13 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter @Builder
-public class GetPromotionRequest {
+public class GetPromotionResponse {
 
     private Long id;
 
     private String name;
 
     private String description;
+
+    private Long companyId;
 }

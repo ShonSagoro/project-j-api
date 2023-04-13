@@ -5,10 +5,13 @@ import com.estancia.juventudes.controllers.dtos.request.CreateCategoryRequest;
 import com.estancia.juventudes.controllers.dtos.request.UpdateCategoryRequest;
 import com.estancia.juventudes.controllers.dtos.response.BaseResponse;
 import com.estancia.juventudes.controllers.dtos.response.GetCategoryResponse;
+import com.estancia.juventudes.controllers.dtos.response.GetCompanyResponse;
 import com.estancia.juventudes.entities.Category;
 import com.estancia.juventudes.entities.enums.converters.ColorTypeConverter;
 import com.estancia.juventudes.repositories.ICategoryRepository;
 import com.estancia.juventudes.services.interfaces.ICategoryService;
+import com.estancia.juventudes.services.interfaces.ICompanyService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +24,13 @@ public class CategoryServiceImpl implements ICategoryService {
 
     private final ICategoryRepository repository;
 
+    private final ICompanyService companyService;
+
     private final ColorTypeConverter converter;
 
-    public CategoryServiceImpl(ICategoryRepository repository, ColorTypeConverter converter) {
+    public CategoryServiceImpl(ICategoryRepository repository, @Lazy ICompanyService companyService, ColorTypeConverter converter) {
         this.repository = repository;
+        this.companyService = companyService;
         this.converter = converter;
     }
 
@@ -78,6 +84,23 @@ public class CategoryServiceImpl implements ICategoryService {
                 .message("find all categories")
                 .success(true)
                 .httpStatus(HttpStatus.FOUND).build();
+    }
+
+    @Override
+    public BaseResponse getAllCompanies(Long id) {
+
+        List<GetCompanyResponse> responses= companyService.GetCompaniesByCategoryId(id);
+        return BaseResponse.builder()
+                .data(responses)
+                .message("find all companies by category id")
+                .success(true)
+                .httpStatus(HttpStatus.FOUND).build();
+    }
+
+    @Override
+    public Category getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(NotFoundException::new);
     }
 
     @Override

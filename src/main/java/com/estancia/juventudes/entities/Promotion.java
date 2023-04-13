@@ -18,6 +18,6 @@ public class Promotion {
 
     private String description;
 
-
-
+    @ManyToOne
+    private Company company;
 }

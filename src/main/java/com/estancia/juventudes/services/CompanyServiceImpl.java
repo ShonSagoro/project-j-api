@@ -3,22 +3,37 @@ package com.estancia.juventudes.services;
 import com.estancia.juventudes.controllers.dtos.request.CreateCompanyRequest;
 import com.estancia.juventudes.controllers.dtos.request.UpdateCompanyRequest;
 import com.estancia.juventudes.controllers.dtos.response.BaseResponse;
+import com.estancia.juventudes.controllers.dtos.response.GetCategoryResponse;
 import com.estancia.juventudes.controllers.dtos.response.GetCompanyResponse;
+import com.estancia.juventudes.controllers.dtos.response.GetPromotionResponse;
+import com.estancia.juventudes.entities.Category;
 import com.estancia.juventudes.entities.Company;
 import com.estancia.juventudes.repositories.ICompanyRepository;
+import com.estancia.juventudes.services.interfaces.ICategoryService;
 import com.estancia.juventudes.services.interfaces.ICompanyService;
+import com.estancia.juventudes.services.interfaces.IPromotionService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CompanyServiceImpl implements ICompanyService {
 
     private final ICompanyRepository repository;
 
-    public CompanyServiceImpl(ICompanyRepository repository) {
+    private final IPromotionService promotionService;
+
+    private final ICategoryService categoryService;
+
+    public CompanyServiceImpl(ICompanyRepository repository, @Lazy IPromotionService promotionService, ICategoryService categoryService) {
         this.repository = repository;
+        this.promotionService = promotionService;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -64,6 +79,28 @@ public class CompanyServiceImpl implements ICompanyService {
             repository.deleteById(id);
     }
 
+    @Override
+    public List<GetCompanyResponse> GetCompaniesByCategoryId(Long id) {
+        return  repository.findByCategoryId(id)
+                .stream()
+                .map(this::from).collect(Collectors.toList());
+    }
+
+    @Override
+    public BaseResponse getAllPromotion(Long id) {
+        List<GetPromotionResponse> responses= promotionService.GetPromotionsByCompanyId(id);
+        return BaseResponse.builder()
+                .data(responses)
+                .message("find all promotions")
+                .success(true)
+                .httpStatus(HttpStatus.FOUND).build();
+    }
+
+    @Override
+    public Company getById(Long id) {
+        return repository.findById(id).orElseThrow(RuntimeException::new);
+    }
+
 
     private GetCompanyResponse from(Long id){
         Company company = repository.findById(id).orElseThrow(RuntimeException::new);
@@ -79,6 +116,7 @@ public class CompanyServiceImpl implements ICompanyService {
         response.setLogo(company.getLogo());
         response.setLatitude(company.getLatitude());
         response.setLongitude(company.getLongitude());
+        response.setCategoryId(company.getCategory().getId());
         return response;
     }
 
@@ -90,6 +128,7 @@ public class CompanyServiceImpl implements ICompanyService {
         company.setLogo(request.getLogo());
         company.setLatitude(request.getLatitude());
         company.setLongitude(request.getLongitude());
+        company.setCategory(categoryService.getById(request.getCategoryId()));
         return company;
     }
 

@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table(name = "categories")
 @Getter @Setter
@@ -23,4 +25,7 @@ public class Category {
     private ColorType color;
 
     private String iconUrl;
+
+    @OneToMany(mappedBy = "category")
+    private List<Company> companies;
 }
