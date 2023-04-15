@@ -7,6 +7,7 @@ import com.estancia.juventudes.controllers.dtos.response.BaseResponse;
 import com.estancia.juventudes.controllers.dtos.response.GetCategoryResponse;
 import com.estancia.juventudes.controllers.dtos.response.GetCompanyResponse;
 import com.estancia.juventudes.entities.Category;
+import com.estancia.juventudes.entities.Company;
 import com.estancia.juventudes.entities.enums.converters.ColorTypeConverter;
 import com.estancia.juventudes.repositories.ICategoryRepository;
 import com.estancia.juventudes.services.interfaces.ICategoryService;
@@ -28,6 +29,8 @@ public class CategoryServiceImpl implements ICategoryService {
 
     private final ColorTypeConverter converter;
 
+
+
     public CategoryServiceImpl(ICategoryRepository repository, @Lazy ICompanyService companyService, ColorTypeConverter converter) {
         this.repository = repository;
         this.companyService = companyService;
@@ -36,10 +39,9 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public BaseResponse get(Long id) {
-        Category category = repository.findById(id)
-                .orElseThrow(NotFoundException::new);
+        GetCategoryResponse response = from(id);
         return BaseResponse.builder()
-                .data(from(category))
+                .data(response)
                 .message("Category has been found")
                 .success(true)
                 .httpStatus(HttpStatus.FOUND).build();
@@ -47,11 +49,8 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public BaseResponse create(CreateCategoryRequest request) {
-        Optional<Category> possibleCopy = repository.findByName(request.getName());
+        findCopy(request);
 
-        if(possibleCopy.isPresent()){
-            throw new RuntimeException("the category exist"); // (RegisterException)
-        }
         Category category = repository.save(from(request));
         GetCategoryResponse response= from(category);
 
@@ -61,7 +60,6 @@ public class CategoryServiceImpl implements ICategoryService {
                 .success(true)
                 .httpStatus(HttpStatus.CREATED).build();
     }
-
     @Override
     public BaseResponse update(UpdateCategoryRequest request, Long id) {
         Category category = repository.findById(id).orElseThrow(RuntimeException::new);
@@ -106,6 +104,19 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     public void delete(long id) {
         repository.deleteById(id);
+    }
+
+    private void findCopy(CreateCategoryRequest request){
+        Optional<Category> possibleCopy = repository.findByName(request.getName());
+
+        if(possibleCopy.isPresent()){
+            throw new RuntimeException("the category exist"); // (RegisterException)
+        }
+    }
+
+    private GetCategoryResponse from(Long id){
+        Category category = repository.findById(id).orElseThrow(RuntimeException::new);
+        return from(category);
     }
 
     private GetCategoryResponse from(Category category){

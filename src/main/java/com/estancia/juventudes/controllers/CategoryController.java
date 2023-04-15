@@ -3,7 +3,7 @@ package com.estancia.juventudes.controllers;
 import com.estancia.juventudes.controllers.dtos.request.*;
 import com.estancia.juventudes.controllers.dtos.response.BaseResponse;
 import com.estancia.juventudes.services.interfaces.ICategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("category")
 public class CategoryController {
 
-    @Autowired
     private final ICategoryService service;
 
     public CategoryController(ICategoryService service) {

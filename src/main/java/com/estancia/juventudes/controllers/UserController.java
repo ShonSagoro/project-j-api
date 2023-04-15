@@ -20,7 +20,7 @@ public class UserController {
         this.service = service;
     }
 
-    @PostMapping("get/email")
+    @PostMapping("email")
     public ResponseEntity<BaseResponse> get(@RequestBody LoginRequest request){
         BaseResponse response = service.get(request.getEmail());
         return new ResponseEntity<>(response, response.getHttpStatus());
@@ -32,13 +32,13 @@ public class UserController {
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
-    @PostMapping("/reg")
+    @PostMapping("reg")
     public ResponseEntity<BaseResponse> create(@RequestBody CreateUserRequest request){
         BaseResponse response = service.create(request);
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
-    @PutMapping("/{idUser}")
+    @PutMapping("{idUser}")
     public ResponseEntity<BaseResponse> update(@RequestBody UpdateUserRequest request,
                                                @PathVariable Long idUser){
         BaseResponse response = service.update(request, idUser);

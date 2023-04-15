@@ -15,7 +15,7 @@ public class GuardianController {
     @Autowired
     private IGuardianService service;
 
-    @GetMapping("/id/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<BaseResponse> get(@PathVariable Long id){
         BaseResponse baseResponse = service.get(id);
         return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
@@ -27,13 +27,13 @@ public class GuardianController {
         return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     public ResponseEntity<BaseResponse> update(@PathVariable Long id, @RequestBody UpdateGuardianRequest request){
         BaseResponse baseResponse = service.update(id, request);
         return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/id}")
     public void delete(@PathVariable Long id){
         service.delete(id);
     }

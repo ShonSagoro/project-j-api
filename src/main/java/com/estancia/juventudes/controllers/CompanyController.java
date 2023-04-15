@@ -17,19 +17,19 @@ public class CompanyController {
     @Autowired
     private ICompanyService service;
 
-    @GetMapping("/id/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<BaseResponse> get (@PathVariable Long id){
         BaseResponse baseResponse = service.get(id);
         return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
     }
 
-    @GetMapping("/{id}/promotions")
+    @GetMapping("{id}/promotions")
     public ResponseEntity<BaseResponse> getPromotions (@PathVariable Long id){
         BaseResponse baseResponse = service.getAllPromotion(id);
         return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
     }
 
-    @GetMapping("/page/{pageNumber}")
+    @GetMapping("page/{pageNumber}")
     public Page<GetCompanyResponse> page(@PathVariable Integer pageNumber){
         return service.getAll(PageRequest.of(pageNumber, 20));
     }
@@ -40,13 +40,13 @@ public class CompanyController {
         return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     public ResponseEntity<BaseResponse> update(@PathVariable Long id, @RequestBody UpdateCompanyRequest request){
         BaseResponse baseResponse = service.update(request, id);
         return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public void delete(@PathVariable Long id){
         service.delete(id);
     }
