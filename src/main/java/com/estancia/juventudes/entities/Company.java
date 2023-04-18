@@ -1,8 +1,11 @@
 package com.estancia.juventudes.entities;
 
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Getter @Setter
@@ -24,10 +27,15 @@ public class Company {
     @Column(nullable = false)
     private String logo;
 
-    // area
     @Column(nullable = false)
     private Float latitude;
 
     @Column(nullable = false)
     private Float longitude;
+
+    @OneToMany(mappedBy = "company")
+    private List<Promotion> promotion;
+
+    @ManyToOne
+    private Category category;
 }

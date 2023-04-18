@@ -13,14 +13,14 @@ import com.estancia.juventudes.services.interfaces.IGuardianService;
 import com.estancia.juventudes.services.interfaces.IUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Repository
+@Service
 public class UserServiceImpl implements IUserService {
 
     private final IGuardianService guardianService;
@@ -117,13 +117,12 @@ public class UserServiceImpl implements IUserService {
                 .age(user.getAge())
                 .numberPhone(user.getNumberPhone())
                 .rol(user.getRol())
-                .guardianId(guardian.getId())
+                .guardianId(guardian!=null?guardian.getId():0)
                 .build();
     }
 
     private User from(CreateUserRequest request){
         User user = new User();
-        Guardian guardian = guardianService.getById(request.getGuardianId());
         user.setEmail(request.getEmail());
         user.setName(request.getName());
         user.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
@@ -136,13 +135,16 @@ public class UserServiceImpl implements IUserService {
         user.setAge(request.getAge());
         user.setNumberPhone(request.getNumberPhone());
         user.setRol(request.getRol());
-        user.setGuardian(guardian);
+        if(request.getGuardianId()!=0){
+            Guardian guardian= guardianService.getById(request.getGuardianId());
+            user.setGuardian(guardian);
+        }
         return user;
     }
 
 
+
     private User update(User user, UpdateUserRequest update){
-        Guardian guardian = guardianService.getById(update.getGuardianId());
         user.setName(update.getName());
         user.setEmail(update.getEmail());
         user.setPassword(new BCryptPasswordEncoder().encode(update.getPassword()));
@@ -154,7 +156,13 @@ public class UserServiceImpl implements IUserService {
         user.setAge(update.getAge());
         user.setNumberPhone(update.getNumberPhone());
         user.setRol(update.getRol());
-        user.setGuardian(guardian);
+        if(update.getGuardianId()!=0){
+            Guardian guardian= guardianService.getById(update.getGuardianId());
+            user.setGuardian(guardian);
+        }else{
+            user.setGuardian(null);
+        }
+
         return user;
     }
 

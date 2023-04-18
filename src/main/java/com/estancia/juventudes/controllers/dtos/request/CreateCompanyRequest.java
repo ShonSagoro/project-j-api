@@ -17,4 +17,6 @@ public class CreateCompanyRequest {
     // area
     private Float latitude;
     private Float longitude;
+
+    private Long categoryId;
 }

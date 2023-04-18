@@ -23,6 +23,12 @@ public class CompanyController {
         return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
     }
 
+    @GetMapping("/{id}/promotions")
+    public ResponseEntity<BaseResponse> getPromotions (@PathVariable Long id){
+        BaseResponse baseResponse = service.getAllPromotion(id);
+        return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
+    }
+
     @GetMapping("/page/{pageNumber}")
     public Page<GetCompanyResponse> page(@PathVariable Integer pageNumber){
         return service.getAll(PageRequest.of(pageNumber, 20));
