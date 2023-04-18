@@ -25,8 +25,6 @@ public class GetUserResponse {
 
     private String address;
 
-    private Short age;
-
     private String numberPhone;
 
     private String rol;
