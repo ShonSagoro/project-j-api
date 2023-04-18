@@ -136,7 +136,6 @@ public class UserServiceImpl implements IUserService {
                 .secondLastname(user.getSecondLastname())
                 .dateOfBirth(user.getDateOfBirth())
                 .address(user.getAddress())
-                .age(user.getAge())
                 .numberPhone(user.getNumberPhone())
                 .rol(user.getRol())
                 .guardianId(guardian!=null?guardian.getId():0)
@@ -155,7 +154,6 @@ public class UserServiceImpl implements IUserService {
         user.setSecondLastname(request.getSecondLastname());
         user.setDateOfBirth(request.getDateOfBirth());
         user.setAddress(request.getAddress());
-        user.setAge(request.getAge());
         user.setNumberPhone(request.getNumberPhone());
         user.setRol(request.getRol());
         user.setActive(true);
@@ -176,7 +174,6 @@ public class UserServiceImpl implements IUserService {
         user.setSecondLastname(update.getSecondLastname());
         user.setDateOfBirth(update.getDateOfBirth());
         user.setAddress(update.getAddress());
-        user.setAge(update.getAge());
         user.setNumberPhone(update.getNumberPhone());
         user.setRol(update.getRol());
         if(update.getGuardianId()!=0){
