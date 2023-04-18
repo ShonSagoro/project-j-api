@@ -17,6 +17,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = service.getUser(username);
         service.verifyAge(user);
-        return new UserDetailsImpl(user);
+        if (user.getActive()){
+            return new UserDetailsImpl(user);
+        }else {
+            return null;
+        }
+
     }
 }
