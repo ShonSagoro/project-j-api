@@ -16,6 +16,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = service.getUser(username);
-        return new UserDetailsImpl(user);
+        service.verifyAge(user);
+        if (user.getActive()){
+            return new UserDetailsImpl(user);
+        }else {
+            return null;
+        }
+
     }
 }

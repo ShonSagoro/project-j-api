@@ -33,7 +33,7 @@ public class WebSecurityConfig {
         this.jwtAuthorizationFilter = jwtAuthorizationFilter1;
     }
 
-    private static final String[] AUTHORIZED_REQUEST = {"/user/reg", "/doc/**"};
+    private static final String[] AUTHORIZED_REQUEST = {"/user/reg", "/doc/**", "file/**"};
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
