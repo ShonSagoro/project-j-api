@@ -1,36 +1,29 @@
 package com.estancia.juventudes.controllers;
 
-import com.estancia.juventudes.controllers.dtos.request.*;
+import com.estancia.juventudes.controllers.dtos.request.CreatePromotionRequest;
+import com.estancia.juventudes.controllers.dtos.request.UpdatePromotionRequest;
 import com.estancia.juventudes.controllers.dtos.response.BaseResponse;
-import com.estancia.juventudes.services.interfaces.ICategoryService;
+import com.estancia.juventudes.services.interfaces.IPromotionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("category")
-public class CategoryController {
+@RequestMapping("promotion")
+public class PromotionController {
 
-    @Autowired
-    private final ICategoryService service;
+    private final IPromotionService service;
 
-    public CategoryController(ICategoryService service) {
+    public PromotionController(IPromotionService service) {
         this.service = service;
     }
+
 
     @GetMapping("{id}")
     public ResponseEntity<BaseResponse> get(@PathVariable Long id){
         BaseResponse response = service.get(id);
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
-
-    @GetMapping("{id}/companies")
-    public ResponseEntity<BaseResponse> getCompanies(@PathVariable Long id){
-        BaseResponse response = service.getAllCompanies(id);
-        return new ResponseEntity<>(response, response.getHttpStatus());
-    }
-
-
 
     @GetMapping
     public ResponseEntity<BaseResponse> getAll(){
@@ -39,13 +32,13 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<BaseResponse> create(@RequestBody CreateCategoryRequest request){
+    public ResponseEntity<BaseResponse> create(@RequestBody CreatePromotionRequest request){
         BaseResponse response = service.create(request);
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<BaseResponse> update(@RequestBody UpdateCategoryRequest request,
+    public ResponseEntity<BaseResponse> update(@RequestBody UpdatePromotionRequest request,
                                                @PathVariable Long id){
         BaseResponse response = service.update(request, id);
         return new ResponseEntity<>(response, response.getHttpStatus());

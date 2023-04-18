@@ -5,12 +5,13 @@ import com.estancia.juventudes.controllers.dtos.request.CreateCategoryRequest;
 import com.estancia.juventudes.controllers.dtos.request.UpdateCategoryRequest;
 import com.estancia.juventudes.controllers.dtos.response.BaseResponse;
 import com.estancia.juventudes.controllers.dtos.response.GetCategoryResponse;
-import com.estancia.juventudes.controllers.dtos.response.GetUserResponse;
+import com.estancia.juventudes.controllers.dtos.response.GetCompanyResponse;
 import com.estancia.juventudes.entities.Category;
-import com.estancia.juventudes.entities.User;
 import com.estancia.juventudes.entities.enums.converters.ColorTypeConverter;
 import com.estancia.juventudes.repositories.ICategoryRepository;
 import com.estancia.juventudes.services.interfaces.ICategoryService;
+import com.estancia.juventudes.services.interfaces.ICompanyService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -23,19 +24,22 @@ public class CategoryServiceImpl implements ICategoryService {
 
     private final ICategoryRepository repository;
 
+    private final ICompanyService companyService;
+
     private final ColorTypeConverter converter;
 
-    public CategoryServiceImpl(ICategoryRepository repository, ColorTypeConverter converter) {
+    public CategoryServiceImpl(ICategoryRepository repository, @Lazy ICompanyService companyService, ColorTypeConverter converter) {
         this.repository = repository;
+        this.companyService = companyService;
         this.converter = converter;
     }
 
     @Override
     public BaseResponse get(Long id) {
-        Category user = repository.findById(id)
+        Category category = repository.findById(id)
                 .orElseThrow(NotFoundException::new);
         return BaseResponse.builder()
-                .data(from(user))
+                .data(from(category))
                 .message("Category has been found")
                 .success(true)
                 .httpStatus(HttpStatus.FOUND).build();
@@ -59,8 +63,8 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
-    public BaseResponse update(UpdateCategoryRequest request, Long idCategory) {
-        Category category = repository.findById(idCategory).orElseThrow(RuntimeException::new);
+    public BaseResponse update(UpdateCategoryRequest request, Long id) {
+        Category category = repository.findById(id).orElseThrow(RuntimeException::new);
         Category response = repository.save(update(category, request));
         return BaseResponse.builder()
                 .data(from(response))
@@ -80,6 +84,23 @@ public class CategoryServiceImpl implements ICategoryService {
                 .message("find all categories")
                 .success(true)
                 .httpStatus(HttpStatus.FOUND).build();
+    }
+
+    @Override
+    public BaseResponse getAllCompanies(Long id) {
+
+        List<GetCompanyResponse> responses= companyService.GetCompaniesByCategoryId(id);
+        return BaseResponse.builder()
+                .data(responses)
+                .message("find all companies by category id")
+                .success(true)
+                .httpStatus(HttpStatus.FOUND).build();
+    }
+
+    @Override
+    public Category getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(NotFoundException::new);
     }
 
     @Override

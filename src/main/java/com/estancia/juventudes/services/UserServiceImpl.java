@@ -13,7 +13,7 @@ import com.estancia.juventudes.services.interfaces.IGuardianService;
 import com.estancia.juventudes.services.interfaces.IUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDate;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Repository
+@Service
 public class UserServiceImpl implements IUserService {
 
     private final IGuardianService guardianService;
@@ -144,7 +144,6 @@ public class UserServiceImpl implements IUserService {
 
     private User from(CreateUserRequest request){
         User user = new User();
-        Guardian guardian = guardianService.getById(request.getGuardianId());
         user.setEmail(request.getEmail());
         user.setName(request.getName());
         user.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
@@ -162,6 +161,7 @@ public class UserServiceImpl implements IUserService {
         }
         return user;
     }
+
 
 
     private User update(User user, UpdateUserRequest update){
