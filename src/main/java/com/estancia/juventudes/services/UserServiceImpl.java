@@ -16,6 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -86,6 +88,7 @@ public class UserServiceImpl implements IUserService {
                 .httpStatus(HttpStatus.FOUND).build();
     }
 
+
     @Override
     public void delete(long id) {
         repository.deleteById(id);
@@ -100,6 +103,25 @@ public class UserServiceImpl implements IUserService {
     @Override
     public User getById(Long id) {
         return repository.findById(id).orElseThrow(RuntimeException::new);
+    }
+
+    @Override
+    public void verifyAge(User user) {
+        Long age = getAge(user.getId());
+        Boolean status = isValid(age);
+        user.setActive(status);
+        repository.save(user);
+    }
+
+    public Boolean isValid(Long age){
+        return age <= 29;
+    }
+
+    public Long getAge(Long id){
+        User user = repository.findById(id).orElseThrow(RuntimeException::new);
+        LocalDate dateOfBirth = LocalDate.parse(user.getDateOfBirth());
+        LocalDate todayDate = LocalDate.now();
+        return ChronoUnit.YEARS.between(dateOfBirth, todayDate);
     }
 
     private GetUserResponse from(User user){
@@ -117,7 +139,7 @@ public class UserServiceImpl implements IUserService {
                 .age(user.getAge())
                 .numberPhone(user.getNumberPhone())
                 .rol(user.getRol())
-                .guardianId(guardian.getId())
+                .guardianId(guardian!=null?guardian.getId():0)
                 .build();
     }
 
@@ -136,13 +158,16 @@ public class UserServiceImpl implements IUserService {
         user.setAge(request.getAge());
         user.setNumberPhone(request.getNumberPhone());
         user.setRol(request.getRol());
-        user.setGuardian(guardian);
+        user.setActive(true);
+        if(request.getGuardianId()!=0){
+            user.setGuardian(guardian);
+        }
         return user;
     }
 
 
     private User update(User user, UpdateUserRequest update){
-        Guardian guardian = guardianService.getById(update.getGuardianId());
+
         user.setName(update.getName());
         user.setEmail(update.getEmail());
         user.setPassword(new BCryptPasswordEncoder().encode(update.getPassword()));
@@ -154,7 +179,12 @@ public class UserServiceImpl implements IUserService {
         user.setAge(update.getAge());
         user.setNumberPhone(update.getNumberPhone());
         user.setRol(update.getRol());
-        user.setGuardian(guardian);
+        if(update.getGuardianId()!=0){
+            Guardian guardian= guardianService.getById(update.getGuardianId());
+            user.setGuardian(guardian);
+        }else{
+            user.setGuardian(null);
+        }
         return user;
     }
 

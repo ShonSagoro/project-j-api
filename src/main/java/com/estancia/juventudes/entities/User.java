@@ -42,6 +42,8 @@ public class User {
 
     private String rol;
 
+    private Boolean active;
+
     @ManyToOne
     private Guardian guardian;
 

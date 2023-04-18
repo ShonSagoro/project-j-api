@@ -18,4 +18,6 @@ public interface IUserService {
     User getUser(String email);
 
     User getById(Long id);
+
+    void verifyAge(User user);
 }
