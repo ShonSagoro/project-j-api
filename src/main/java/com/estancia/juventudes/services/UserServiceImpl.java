@@ -157,6 +157,7 @@ public class UserServiceImpl implements IUserService {
         user.setRol(request.getRol());
         user.setActive(true);
         if(request.getGuardianId()!=0){
+            Guardian guardian= guardianService.getById(request.getGuardianId());
             user.setGuardian(guardian);
         }
         return user;

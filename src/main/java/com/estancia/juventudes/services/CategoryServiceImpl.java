@@ -66,7 +66,7 @@ public class CategoryServiceImpl implements ICategoryService {
         Category response = repository.save(update(category, request));
         return BaseResponse.builder()
                 .data(from(response))
-                .message("category updated")
+                .message("The category has been updated")
                 .success(true)
                 .httpStatus(HttpStatus.ACCEPTED).build();
     }
@@ -79,7 +79,7 @@ public class CategoryServiceImpl implements ICategoryService {
                 .map(this::from).collect(Collectors.toList());
         return BaseResponse.builder()
                 .data(responses)
-                .message("find all categories")
+                .message("All categories found")
                 .success(true)
                 .httpStatus(HttpStatus.FOUND).build();
     }
@@ -90,7 +90,7 @@ public class CategoryServiceImpl implements ICategoryService {
         List<GetCompanyResponse> responses= companyService.GetCompaniesByCategoryId(id);
         return BaseResponse.builder()
                 .data(responses)
-                .message("find all companies by category id")
+                .message("All companies found by category ID")
                 .success(true)
                 .httpStatus(HttpStatus.FOUND).build();
     }
