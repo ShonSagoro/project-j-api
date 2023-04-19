@@ -6,6 +6,6 @@ import lombok.Setter;
 
 @Getter @Setter
 public class CodeQRRequest {
-    @Size(min=18, max=18, message = "La curp debe tener 18 caracteres")
+
     private String curp;
 }

@@ -18,7 +18,6 @@ public class CreateUserRequest {
     private String password;
 
     @NonNull
-    @Size(min=18, max=18, message = "La curp debe tener 18 caracteres")
     private String curp;
 
     @NonNull

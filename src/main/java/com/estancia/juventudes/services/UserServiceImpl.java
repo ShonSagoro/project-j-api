@@ -55,11 +55,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public BaseResponse create(CreateUserRequest request) {
-        Optional<User> possibleCopy = repository.findByEmail(request.getEmail());
-
-        if(possibleCopy.isPresent()){
-            throw new RuntimeException("the user exist"); // (RegisterException)
-        }
+        checkPossibleCopies(request);
         User user = repository.save(from(request));
         GetUserResponse response= from(user);
 
@@ -146,6 +142,25 @@ public class UserServiceImpl implements IUserService {
         LocalDate dateOfBirth = LocalDate.parse(user.getDateOfBirth());
         LocalDate todayDate = LocalDate.now();
         return ChronoUnit.YEARS.between(dateOfBirth, todayDate);
+    }
+
+    private void checkPossibleCopies(CreateUserRequest request){
+        copyByCurp(request.getCurp());
+        copyByEmail(request.getEmail());
+    }
+
+    private void copyByCurp(String curp){
+        Optional<User> possibleCopy=repository.findByCurp(curp);
+        if(possibleCopy.isPresent()){
+            throw new RuntimeException("There is already a user with that curp");
+        }
+    }
+
+    private void copyByEmail(String email){
+        Optional<User> possibleCopy = repository.findByEmail(email);
+        if(possibleCopy.isPresent()){
+            throw new RuntimeException("There is already a user with that Email");
+        }
     }
 
     private User from(String curp) {
