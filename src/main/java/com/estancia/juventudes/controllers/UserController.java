@@ -1,5 +1,6 @@
 package com.estancia.juventudes.controllers;
 
+import com.estancia.juventudes.controllers.dtos.request.CodeQRRequest;
 import com.estancia.juventudes.controllers.dtos.request.CreateUserRequest;
 import com.estancia.juventudes.controllers.dtos.request.LoginRequest;
 import com.estancia.juventudes.controllers.dtos.request.UpdateUserRequest;
@@ -10,9 +11,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 
 @RestController
 @RequestMapping("user")
@@ -23,6 +29,21 @@ public class UserController {
 
     public UserController(IUserService service){
         this.service = service;
+    }
+
+
+    @Operation(summary = "Get the code qr by user curp")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The code has been generated"),
+            @ApiResponse(responseCode = "401", description = "The code is not generated or you are not authorized")
+    })
+    @PostMapping("/code")
+    public void generateQRCode(HttpServletResponse response,@RequestBody CodeQRRequest request) throws Exception {
+        BufferedImage image = service.getCodeQR(request);
+        ServletOutputStream outputStream = response.getOutputStream();
+        ImageIO.write(image, "png", outputStream);
+        outputStream.flush();
+        outputStream.close();
     }
 
     @Operation(summary = "Get a promotion by email")

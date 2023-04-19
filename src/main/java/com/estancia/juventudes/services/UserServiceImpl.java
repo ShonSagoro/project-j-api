@@ -1,6 +1,7 @@
 package com.estancia.juventudes.services;
 
 import com.estancia.juventudes.controllers.advices.exceptions.NotFoundException;
+import com.estancia.juventudes.controllers.dtos.request.CodeQRRequest;
 import com.estancia.juventudes.controllers.dtos.request.CreateUserRequest;
 import com.estancia.juventudes.controllers.dtos.request.UpdateUserRequest;
 import com.estancia.juventudes.controllers.dtos.response.BaseResponse;
@@ -11,11 +12,14 @@ import com.estancia.juventudes.entities.enums.converters.GenderTypeConverter;
 import com.estancia.juventudes.repositories.IUserRepository;
 import com.estancia.juventudes.services.interfaces.IGuardianService;
 import com.estancia.juventudes.services.interfaces.IUserService;
+import com.estancia.juventudes.utilities.CodeQRUtils;
+import com.google.zxing.WriterException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
+import java.awt.image.BufferedImage;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -30,7 +34,8 @@ public class UserServiceImpl implements IUserService {
 
     private final GenderTypeConverter converter;
 
-    public UserServiceImpl( IGuardianService guardianService, IUserRepository repository, GenderTypeConverter converter) {
+
+    public UserServiceImpl(IGuardianService guardianService, IUserRepository repository, GenderTypeConverter converter) {
         this.guardianService = guardianService;
         this.repository = repository;
         this.converter = converter;
@@ -100,6 +105,9 @@ public class UserServiceImpl implements IUserService {
                 .orElseThrow(RuntimeException::new);
     }
 
+
+
+
     @Override
     public User getById(Long id) {
         return repository.findById(id).orElseThrow(RuntimeException::new);
@@ -113,6 +121,13 @@ public class UserServiceImpl implements IUserService {
         repository.save(user);
     }
 
+    @Override
+    public BufferedImage getCodeQR(CodeQRRequest request) throws WriterException {
+        User user=from(request.getCurp());
+        String info=getInfoQR(user);
+        return CodeQRUtils.generateQRCode(info);
+    }
+
     public Boolean isValid(Long age){
         return age <= 29;
     }
@@ -123,6 +138,16 @@ public class UserServiceImpl implements IUserService {
         LocalDate todayDate = LocalDate.now();
         return ChronoUnit.YEARS.between(dateOfBirth, todayDate);
     }
+
+    private User from(String curp) {
+        return repository.findByCurp(curp)
+                .orElseThrow(RuntimeException::new);
+    }
+
+    private String getInfoQR(User user){
+        return user.getEmail()+"_"+user.getCurp();
+    }
+
 
     private GetUserResponse from(User user){
         Guardian guardian = user.getGuardian();
