@@ -1,5 +1,6 @@
 package com.estancia.juventudes.controllers.dtos.request;
 
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -17,6 +18,7 @@ public class CreateUserRequest {
     private String password;
 
     @NonNull
+    @Size(min=18, max=18, message = "La curp debe tener 18 caracteres")
     private String curp;
 
     @NonNull

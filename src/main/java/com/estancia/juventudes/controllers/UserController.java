@@ -1,9 +1,6 @@
 package com.estancia.juventudes.controllers;
 
-import com.estancia.juventudes.controllers.dtos.request.CodeQRRequest;
-import com.estancia.juventudes.controllers.dtos.request.CreateUserRequest;
-import com.estancia.juventudes.controllers.dtos.request.LoginRequest;
-import com.estancia.juventudes.controllers.dtos.request.UpdateUserRequest;
+import com.estancia.juventudes.controllers.dtos.request.*;
 import com.estancia.juventudes.controllers.dtos.response.BaseResponse;
 import com.estancia.juventudes.services.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,6 +41,20 @@ public class UserController {
         ImageIO.write(image, "png", outputStream);
         outputStream.flush();
         outputStream.close();
+    }
+
+    @Operation(summary = "Get state the account with the QR info")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "State of account",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class)) }),
+            @ApiResponse(responseCode = "401", description = "User not found or you are not authorized",
+                    content = @Content)
+    })
+    @PostMapping("verity")
+    public ResponseEntity<BaseResponse> verityCodeQR(@RequestBody CodeQRInfoRequest request){
+        BaseResponse response = service.validityCodeQR(request);
+        return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
     @Operation(summary = "Get a promotion by email")

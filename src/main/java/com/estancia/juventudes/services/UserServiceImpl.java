@@ -1,6 +1,7 @@
 package com.estancia.juventudes.services;
 
 import com.estancia.juventudes.controllers.advices.exceptions.NotFoundException;
+import com.estancia.juventudes.controllers.dtos.request.CodeQRInfoRequest;
 import com.estancia.juventudes.controllers.dtos.request.CodeQRRequest;
 import com.estancia.juventudes.controllers.dtos.request.CreateUserRequest;
 import com.estancia.juventudes.controllers.dtos.request.UpdateUserRequest;
@@ -93,6 +94,17 @@ public class UserServiceImpl implements IUserService {
                 .httpStatus(HttpStatus.FOUND).build();
     }
 
+    @Override
+    public BaseResponse validityCodeQR(CodeQRInfoRequest request) {
+        User user=from(request.getCurp());
+        verifyAge(user);
+        return BaseResponse.builder()
+                .data(user.getActive())
+                .message("The state of user")
+                .success(true)
+                .httpStatus(HttpStatus.FOUND).build();
+    }
+
 
     @Override
     public void delete(long id) {
@@ -104,9 +116,6 @@ public class UserServiceImpl implements IUserService {
         return repository.findByEmail(email)
                 .orElseThrow(RuntimeException::new);
     }
-
-
-
 
     @Override
     public User getById(Long id) {
@@ -145,7 +154,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     private String getInfoQR(User user){
-        return user.getEmail()+"_"+user.getCurp();
+        return "Curp: " + user.getCurp();
     }
 
 

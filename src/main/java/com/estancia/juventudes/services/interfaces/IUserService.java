@@ -1,5 +1,6 @@
 package com.estancia.juventudes.services.interfaces;
 
+import com.estancia.juventudes.controllers.dtos.request.CodeQRInfoRequest;
 import com.estancia.juventudes.controllers.dtos.request.CodeQRRequest;
 import com.estancia.juventudes.controllers.dtos.request.CreateUserRequest;
 import com.estancia.juventudes.controllers.dtos.request.UpdateUserRequest;
@@ -17,6 +18,10 @@ public interface IUserService {
 
     BaseResponse getAll();
 
+    BaseResponse validityCodeQR(CodeQRInfoRequest request);
+
+    BufferedImage getCodeQR(CodeQRRequest request) throws WriterException;
+
     void delete(long id);
 
     User getUser(String email);
@@ -25,5 +30,5 @@ public interface IUserService {
 
     void verifyAge(User user);
 
-    BufferedImage getCodeQR(CodeQRRequest request) throws WriterException;
+
 }
