@@ -1,9 +1,14 @@
 package com.estancia.juventudes.services.interfaces;
 
+import com.estancia.juventudes.controllers.dtos.request.CodeQRInfoRequest;
+import com.estancia.juventudes.controllers.dtos.request.CodeQRRequest;
 import com.estancia.juventudes.controllers.dtos.request.CreateUserRequest;
 import com.estancia.juventudes.controllers.dtos.request.UpdateUserRequest;
 import com.estancia.juventudes.controllers.dtos.response.BaseResponse;
 import com.estancia.juventudes.entities.User;
+import com.google.zxing.WriterException;
+
+import java.awt.image.BufferedImage;
 
 public interface IUserService {
     BaseResponse get(String email);
@@ -13,6 +18,10 @@ public interface IUserService {
 
     BaseResponse getAll();
 
+    BaseResponse validityCodeQR(CodeQRInfoRequest request);
+
+    BufferedImage getCodeQR(CodeQRRequest request) throws WriterException;
+
     void delete(long id);
 
     User getUser(String email);
@@ -21,5 +30,4 @@ public interface IUserService {
 
     void verifyAge(User user);
 
-    boolean verifyCurp(String curpUser);
 }

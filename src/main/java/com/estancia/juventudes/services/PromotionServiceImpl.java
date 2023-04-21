@@ -31,14 +31,14 @@ public class PromotionServiceImpl implements IPromotionService {
 
     @Override
     public BaseResponse get(Long id) {
-        Promotion promotion = repository.findById(id)
-                .orElseThrow(NotFoundException::new);
+        GetPromotionResponse response=from(id);
         return BaseResponse.builder()
-                .data(from(promotion))
+                .data(response)
                 .message("Promotion has been found")
                 .success(true)
                 .httpStatus(HttpStatus.FOUND).build();
     }
+
 
     @Override
     public BaseResponse create(CreatePromotionRequest request) {
@@ -54,7 +54,8 @@ public class PromotionServiceImpl implements IPromotionService {
 
     @Override
     public BaseResponse update(UpdatePromotionRequest request, Long id) {
-        Promotion promotion = repository.findById(id).orElseThrow(RuntimeException::new);
+        Promotion promotion = repository.findById(id)
+                .orElseThrow(RuntimeException::new);
         Promotion response = repository.save(update(promotion, request));
         return BaseResponse.builder()
                 .data(from(response))
@@ -89,6 +90,13 @@ public class PromotionServiceImpl implements IPromotionService {
                 .map(this::from).collect(Collectors.toList());
     }
 
+    private GetPromotionResponse from(Long id){
+        Promotion promotion = repository.findById(id)
+                .orElseThrow(NotFoundException::new);
+        return from(promotion);
+    }
+
+
     private GetPromotionResponse from(Promotion promotion){
         return GetPromotionResponse.builder()
                 .id(promotion.getId())
@@ -97,7 +105,6 @@ public class PromotionServiceImpl implements IPromotionService {
                 .companyId(promotion.getCompany().getId())
                 .build();
     }
-
 
     private Promotion from(CreatePromotionRequest request){
         Promotion promotion=new Promotion();

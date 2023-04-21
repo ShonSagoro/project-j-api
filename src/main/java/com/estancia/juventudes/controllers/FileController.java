@@ -1,5 +1,11 @@
 package com.estancia.juventudes.controllers;
 
+import com.estancia.juventudes.controllers.dtos.response.BaseResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -23,6 +29,14 @@ public class FileController {
     @Value("${upload.path}")
     private String uploadPath;
 
+    @Operation(summary = "Upload a file")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The file has been uploaded",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseEntity.class)) }),
+            @ApiResponse(responseCode = "400", description = "File not valid",
+                    content = @Content)
+    })
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
         if (file.isEmpty()) {
@@ -41,6 +55,12 @@ public class FileController {
     }
 
 
+    @Operation(summary = "Download a file")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The file has been found",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseEntity.class)) })
+    })
     @GetMapping("/files/{fileName:.+}")
     public ResponseEntity<byte[]> downloadFile(@PathVariable String fileName, HttpServletResponse response) throws IOException {
         Path filePath = Paths.get(uploadPath + fileName);
