@@ -20,6 +20,8 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,14 +56,22 @@ public class UserServiceImpl implements IUserService {
         if(possibleCopy.isPresent()){
             throw new RuntimeException("the user exist"); // (RegisterException)
         }
-        User user = repository.save(from(request));
-        GetUserResponse response= from(user);
+        else if (verifyCurp(request.getCurp()) ){
+            User user = repository.save(from(request));
+            GetUserResponse response= from(user);
 
+            return BaseResponse.builder()
+                    .data(response)
+                    .message("The user has been created")
+                    .success(true)
+                    .httpStatus(HttpStatus.CREATED).build();
+        }
+        CreateUserRequest user = request;
         return BaseResponse.builder()
-                .data(response)
-                .message("The user has been created")
-                .success(true)
-                .httpStatus(HttpStatus.CREATED).build();
+                .data(user)
+                .message("The user was not created by an unexpected value ")
+                .success(false)
+                .httpStatus(HttpStatus.CONFLICT).build();
     }
 
     @Override
@@ -157,7 +167,7 @@ public class UserServiceImpl implements IUserService {
         user.setRol(request.getRol());
         user.setActive(true);
         if(request.getGuardianId()!=0){
-            user.setGuardian(guardian);
+       //     user.setGuardian(guardian);
         }
         return user;
     }
@@ -183,6 +193,20 @@ public class UserServiceImpl implements IUserService {
             user.setGuardian(null);
         }
         return user;
+    }
+
+    public boolean verifyCurp (String curpUser) {
+        String curp = curpUser;
+
+        String seachr = "^[A-Z]{4}\\d{6}[H|M][A-Z]{5}[A-Z0-9]{2}$";
+        Pattern patron = Pattern.compile(seachr);
+        Matcher verify = patron.matcher(curp);
+        if(verify.matches()){
+
+            return true;
+        }return false;
+
+
     }
 
 }

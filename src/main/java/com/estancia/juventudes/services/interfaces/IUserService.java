@@ -20,4 +20,6 @@ public interface IUserService {
     User getById(Long id);
 
     void verifyAge(User user);
+
+    boolean verifyCurp(String curpUser);
 }
