@@ -1,6 +1,8 @@
 package com.estancia.juventudes.services;
 
 import com.estancia.juventudes.controllers.advices.exceptions.NotFoundException;
+import com.estancia.juventudes.controllers.dtos.request.CodeQRInfoRequest;
+import com.estancia.juventudes.controllers.dtos.request.CodeQRRequest;
 import com.estancia.juventudes.controllers.dtos.request.CreateUserRequest;
 import com.estancia.juventudes.controllers.dtos.request.UpdateUserRequest;
 import com.estancia.juventudes.controllers.dtos.response.BaseResponse;
@@ -11,11 +13,14 @@ import com.estancia.juventudes.entities.enums.converters.GenderTypeConverter;
 import com.estancia.juventudes.repositories.IUserRepository;
 import com.estancia.juventudes.services.interfaces.IGuardianService;
 import com.estancia.juventudes.services.interfaces.IUserService;
+import com.estancia.juventudes.utilities.CodeQRUtils;
+import com.google.zxing.WriterException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
+import java.awt.image.BufferedImage;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -30,7 +35,8 @@ public class UserServiceImpl implements IUserService {
 
     private final GenderTypeConverter converter;
 
-    public UserServiceImpl( IGuardianService guardianService, IUserRepository repository, GenderTypeConverter converter) {
+
+    public UserServiceImpl(IGuardianService guardianService, IUserRepository repository, GenderTypeConverter converter) {
         this.guardianService = guardianService;
         this.repository = repository;
         this.converter = converter;
@@ -49,11 +55,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public BaseResponse create(CreateUserRequest request) {
-        Optional<User> possibleCopy = repository.findByEmail(request.getEmail());
-
-        if(possibleCopy.isPresent()){
-            throw new RuntimeException("the user exist"); // (RegisterException)
-        }
+        checkPossibleCopies(request);
         User user = repository.save(from(request));
         GetUserResponse response= from(user);
 
@@ -88,6 +90,17 @@ public class UserServiceImpl implements IUserService {
                 .httpStatus(HttpStatus.FOUND).build();
     }
 
+    @Override
+    public BaseResponse validityCodeQR(CodeQRInfoRequest request) {
+        User user=from(request.getCurp());
+        verifyAge(user);
+        return BaseResponse.builder()
+                .data(user.getActive())
+                .message("The state of user")
+                .success(true)
+                .httpStatus(HttpStatus.FOUND).build();
+    }
+
 
     @Override
     public void delete(long id) {
@@ -113,6 +126,13 @@ public class UserServiceImpl implements IUserService {
         repository.save(user);
     }
 
+    @Override
+    public BufferedImage getCodeQR(CodeQRRequest request) throws WriterException {
+        User user=from(request.getCurp());
+        String info=getInfoQR(user);
+        return CodeQRUtils.generateQRCode(info);
+    }
+
     public Boolean isValid(Long age){
         return age <= 29;
     }
@@ -123,6 +143,35 @@ public class UserServiceImpl implements IUserService {
         LocalDate todayDate = LocalDate.now();
         return ChronoUnit.YEARS.between(dateOfBirth, todayDate);
     }
+
+    private void checkPossibleCopies(CreateUserRequest request){
+        copyByCurp(request.getCurp());
+        copyByEmail(request.getEmail());
+    }
+
+    private void copyByCurp(String curp){
+        Optional<User> possibleCopy=repository.findByCurp(curp);
+        if(possibleCopy.isPresent()){
+            throw new RuntimeException("There is already a user with that curp");
+        }
+    }
+
+    private void copyByEmail(String email){
+        Optional<User> possibleCopy = repository.findByEmail(email);
+        if(possibleCopy.isPresent()){
+            throw new RuntimeException("There is already a user with that Email");
+        }
+    }
+
+    private User from(String curp) {
+        return repository.findByCurp(curp)
+                .orElseThrow(RuntimeException::new);
+    }
+
+    private String getInfoQR(User user){
+        return "Curp: " + user.getCurp();
+    }
+
 
     private GetUserResponse from(User user){
         Guardian guardian = user.getGuardian();
@@ -157,6 +206,7 @@ public class UserServiceImpl implements IUserService {
         user.setRol(request.getRol());
         user.setActive(true);
         if(request.getGuardianId()!=0){
+            Guardian guardian= guardianService.getById(request.getGuardianId());
             user.setGuardian(guardian);
         }
         return user;
