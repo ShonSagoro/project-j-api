@@ -30,5 +30,4 @@ public interface IUserService {
 
     void verifyAge(User user);
 
-
 }

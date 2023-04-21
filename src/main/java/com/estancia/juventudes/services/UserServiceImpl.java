@@ -25,6 +25,8 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,6 +58,10 @@ public class UserServiceImpl implements IUserService {
     @Override
     public BaseResponse create(CreateUserRequest request) {
         checkPossibleCopies(request);
+        if (!existCurp(request.getCurp()) ){
+            throw new RuntimeException("The user was not created by an unexpected value");
+        }
+
         User user = repository.save(from(request));
         GetUserResponse response= from(user);
 
@@ -233,6 +239,15 @@ public class UserServiceImpl implements IUserService {
             user.setGuardian(null);
         }
         return user;
+    }
+
+    private boolean existCurp (String curp) {
+
+        String search = "^[A-Z]{4}\\d{6}[H|M][A-Z]{5}[A-Z0-9]{2}$";
+        Pattern patron = Pattern.compile(search);
+        Matcher verify = patron.matcher(curp);
+
+        return verify.matches();
     }
 
 }
