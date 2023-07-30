@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("file")
 public class FileController {
 
     @Value("${upload.path}")
@@ -70,5 +71,11 @@ public class FileController {
         responseHeaders.setContentType(MediaType.IMAGE_JPEG);
 
         return ResponseEntity.ok().headers(responseHeaders).body(fileContent);
+    }
+
+    @Operation(summary = " Quick check of controller operation")
+    @GetMapping("health")
+    public ResponseEntity<String> health() {
+        return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 }

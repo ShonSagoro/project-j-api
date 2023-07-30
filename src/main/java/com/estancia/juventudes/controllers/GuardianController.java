@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,8 +32,7 @@ public class GuardianController {
     })
     @GetMapping("{id}")
     public ResponseEntity<BaseResponse> get(@PathVariable Long id){
-        BaseResponse baseResponse = service.get(id);
-        return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
+        return service.get(id).apply();
     }
 
     @Operation(summary = "Create a Guardian")
@@ -43,8 +43,7 @@ public class GuardianController {
     })
     @PostMapping
     public ResponseEntity<BaseResponse> create(@RequestBody CreateGuardianRequest request){
-        BaseResponse baseResponse = service.create(request);
-        return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
+        return service.create(request).apply();
     }
 
     @Operation(summary = "Update a guardian")
@@ -55,8 +54,7 @@ public class GuardianController {
     })
     @PutMapping("{id}")
     public ResponseEntity<BaseResponse> update(@PathVariable Long id, @RequestBody UpdateGuardianRequest request){
-        BaseResponse baseResponse = service.update(id, request);
-        return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
+        return service.update(id, request).apply();
     }
 
     @Operation(summary = "Delete a guardian")
@@ -68,6 +66,10 @@ public class GuardianController {
         service.delete(id);
     }
 
-
+    @Operation(summary = " Quick check of controller operation")
+    @GetMapping("health")
+    public ResponseEntity<String> health() {
+        return new ResponseEntity<>("OK", HttpStatus.OK);
+    }
 
 }

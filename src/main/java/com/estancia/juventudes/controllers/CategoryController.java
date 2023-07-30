@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,8 +34,7 @@ public class CategoryController {
     })
     @GetMapping("{id}")
     public ResponseEntity<BaseResponse> get(@PathVariable Long id){
-        BaseResponse response = service.get(id);
-        return new ResponseEntity<>(response, response.getHttpStatus());
+        return service.get(id).apply();
     }
 
     @Operation(summary = "Get all companies associated with a category")
@@ -45,8 +45,7 @@ public class CategoryController {
     })
     @GetMapping("{id}/companies")
     public ResponseEntity<BaseResponse> getCompanies(@PathVariable Long id){
-        BaseResponse response = service.getAllCompanies(id);
-        return new ResponseEntity<>(response, response.getHttpStatus());
+        return  service.getAllCompanies(id).apply();
     }
 
 
@@ -58,8 +57,7 @@ public class CategoryController {
     })
     @GetMapping
     public ResponseEntity<BaseResponse> getAll(){
-        BaseResponse response = service.getAll();
-        return new ResponseEntity<>(response, response.getHttpStatus());
+        return service.getAll().apply();
     }
 
     @Operation(summary = "Create a Category")
@@ -72,8 +70,7 @@ public class CategoryController {
     })
     @PostMapping
     public ResponseEntity<BaseResponse> create(@RequestBody CreateCategoryRequest request){
-        BaseResponse response = service.create(request);
-        return new ResponseEntity<>(response, response.getHttpStatus());
+        return service.create(request).apply();
     }
 
     @Operation(summary = "Update a category")
@@ -85,8 +82,7 @@ public class CategoryController {
     @PutMapping("{id}")
     public ResponseEntity<BaseResponse> update(@RequestBody UpdateCategoryRequest request,
                                                @PathVariable Long id){
-        BaseResponse response = service.update(request, id);
-        return new ResponseEntity<>(response, response.getHttpStatus());
+        return service.update(request, id).apply();
     }
 
     @Operation(summary = "Delete a category")
@@ -101,7 +97,7 @@ public class CategoryController {
 
     @Operation(summary = " Quick check of controller operation")
     @GetMapping("health")
-    public String health() {
-        return "Ok";
+    public ResponseEntity<String> health() {
+        return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 }

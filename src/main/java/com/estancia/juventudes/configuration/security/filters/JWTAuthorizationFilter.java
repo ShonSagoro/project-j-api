@@ -1,4 +1,4 @@
-package com.estancia.juventudes.security.filters;
+package com.estancia.juventudes.configuration.security.filters;
 
 import com.estancia.juventudes.utilities.TokenUtils;
 import jakarta.servlet.FilterChain;

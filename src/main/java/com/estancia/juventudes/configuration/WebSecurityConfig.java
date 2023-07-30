@@ -1,13 +1,18 @@
 package com.estancia.juventudes.configuration;
 
-import com.estancia.juventudes.security.filters.JWTAuthorizationFilter;
-import com.estancia.juventudes.security.filters.UserAuthenticationFilter;
+import com.estancia.juventudes.configuration.security.filters.JWTAuthorizationFilter;
+import com.estancia.juventudes.configuration.security.filters.UserAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,20 +25,25 @@ import lombok.NonNull;
 
 import org.springframework.context.annotation.Bean;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfig {
-    private final UserDetailsService userDetailsService;
-    private final JWTAuthorizationFilter jwtAuthorizationFilter;
 
     @Autowired
-    public WebSecurityConfig(UserDetailsService userDetailsService,
-                             JWTAuthorizationFilter jwtAuthorizationFilter1){
-        this.userDetailsService = userDetailsService;
-        this.jwtAuthorizationFilter = jwtAuthorizationFilter1;
-    }
+    private UserDetailsService userDetailsService;
 
-    private static final String[] AUTHORIZED_REQUEST = {"/user/reg", "/doc/**", "file/**"};
+    @Autowired
+    private JWTAuthorizationFilter jwtAuthorizationFilter;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
+    @Value("${miseri.security.allow-request}")
+    private String[] allowedPaths;
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -49,46 +59,32 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http,
-                                           AuthenticationManager authManager) throws Exception{
+    SecurityFilterChain web(HttpSecurity http,  AuthenticationManager authManager) throws Exception {
 
         UserAuthenticationFilter authenticationFilter = new UserAuthenticationFilter();
         authenticationFilter.setAuthenticationManager(authManager);
-        authenticationFilter.setFilterProcessesUrl("/login");
+        authenticationFilter.setFilterProcessesUrl("/user/sign-in");
 
-        return http.cors().and()
-                .csrf().disable()
-                .authorizeHttpRequests()
-                .requestMatchers(AUTHORIZED_REQUEST)
-                .permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .httpBasic()
-                .and()
-                .exceptionHandling()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+        return http.csrf(AbstractHttpConfigurer::disable)
+                .cors(withDefaults())
+                .exceptionHandling(Customizer.withDefaults())
                 .addFilter(authenticationFilter)
                 .addFilterBefore(jwtAuthorizationFilter, UserAuthenticationFilter.class)
-                .build();
+                .authorizeHttpRequests((authorized) -> authorized
+                        .requestMatchers(allowedPaths)
+                        .permitAll().anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(sessionManagement ->
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                ).build();
     }
 
     @Bean
-    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder())
-                .and().build();
+    public AuthenticationManager authManager() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return new ProviderManager(authProvider);
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
-
-    
 }
 
