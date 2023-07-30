@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,8 +35,7 @@ public class PromotionController {
     })
     @GetMapping("{id}")
     public ResponseEntity<BaseResponse> get(@PathVariable Long id){
-        BaseResponse response = service.get(id);
-        return new ResponseEntity<>(response, response.getHttpStatus());
+        return service.get(id).apply();
     }
 
     @Operation(summary = "Get all promotion")
@@ -46,8 +46,7 @@ public class PromotionController {
     })
     @GetMapping
     public ResponseEntity<BaseResponse> getAll(){
-        BaseResponse response = service.getAll();
-        return new ResponseEntity<>(response, response.getHttpStatus());
+        return service.getAll().apply();
     }
 
     @Operation(summary = "Create a Promotion")
@@ -60,8 +59,7 @@ public class PromotionController {
     })
     @PostMapping
     public ResponseEntity<BaseResponse> create(@RequestBody CreatePromotionRequest request){
-        BaseResponse response = service.create(request);
-        return new ResponseEntity<>(response, response.getHttpStatus());
+        return service.create(request).apply();
     }
 
     @Operation(summary = "Update a promotion")
@@ -73,8 +71,7 @@ public class PromotionController {
     @PutMapping("{id}")
     public ResponseEntity<BaseResponse> update(@RequestBody UpdatePromotionRequest request,
                                                @PathVariable Long id){
-        BaseResponse response = service.update(request, id);
-        return new ResponseEntity<>(response, response.getHttpStatus());
+        return service.update(request, id).apply();
     }
 
     @Operation(summary = "Delete a promotion")
@@ -88,7 +85,7 @@ public class PromotionController {
 
     @Operation(summary = " Quick check of controller operation")
     @GetMapping("health")
-    public String health() {
-        return "Ok";
+    public ResponseEntity<String> health() {
+        return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 }

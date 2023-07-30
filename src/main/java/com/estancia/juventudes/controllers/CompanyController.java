@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,8 +35,7 @@ public class CompanyController {
     })
     @GetMapping("{id}")
     public ResponseEntity<BaseResponse> get (@PathVariable Long id){
-        BaseResponse baseResponse = service.get(id);
-        return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
+        return service.get(id).apply();
     }
 
     @Operation(summary = "Get all promotions associated with a company")
@@ -46,8 +46,7 @@ public class CompanyController {
     })
     @GetMapping("{id}/promotions")
     public ResponseEntity<BaseResponse> getPromotions (@PathVariable Long id){
-        BaseResponse baseResponse = service.getAllPromotion(id);
-        return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
+        return service.getAllPromotion(id).apply();
     }
 
     @Operation(summary = "Get list companies by pages")
@@ -61,7 +60,6 @@ public class CompanyController {
         return service.getAll(PageRequest.of(pageNumber, 20));
     }
 
-
     @Operation(summary = "Create a company")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "The company has been created",
@@ -72,8 +70,7 @@ public class CompanyController {
     })
     @PostMapping
     public ResponseEntity<BaseResponse> create(@RequestBody CreateCompanyRequest request){
-        BaseResponse baseResponse = service.create(request);
-        return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
+        return service.create(request).apply();
     }
 
     @Operation(summary = "Update a company")
@@ -84,8 +81,7 @@ public class CompanyController {
     })
     @PutMapping("{id}")
     public ResponseEntity<BaseResponse> update(@PathVariable Long id, @RequestBody UpdateCompanyRequest request){
-        BaseResponse baseResponse = service.update(request, id);
-        return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
+        return service.update(request, id).apply();
     }
 
 
@@ -96,5 +92,11 @@ public class CompanyController {
     @DeleteMapping("{id}")
     public void delete(@PathVariable Long id){
         service.delete(id);
+    }
+
+    @Operation(summary = " Quick check of controller operation")
+    @GetMapping("health")
+    public ResponseEntity<String> health() {
+        return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 }

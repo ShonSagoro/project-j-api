@@ -1,4 +1,4 @@
-package com.estancia.juventudes.security.user;
+package com.estancia.juventudes.configuration.security.user;
 
 import com.estancia.juventudes.entities.User;
 import com.estancia.juventudes.services.interfaces.IUserService;

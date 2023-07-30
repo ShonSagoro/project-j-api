@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,8 +54,7 @@ public class UserController {
     })
     @PostMapping("verity")
     public ResponseEntity<BaseResponse> verityCodeQR(@RequestBody CodeQRInfoRequest request){
-        BaseResponse response = service.validityCodeQR(request);
-        return new ResponseEntity<>(response, response.getHttpStatus());
+        return  service.validityCodeQR(request).apply();
     }
 
     @Operation(summary = "Get a promotion by email")
@@ -67,8 +67,7 @@ public class UserController {
     })
     @PostMapping("email")
     public ResponseEntity<BaseResponse> get(@RequestBody LoginRequest request){
-        BaseResponse response = service.get(request.getEmail());
-        return new ResponseEntity<>(response, response.getHttpStatus());
+        return  service.get(request.getEmail()).apply();
     }
 
     @Operation(summary = "Get all users")
@@ -79,22 +78,7 @@ public class UserController {
     })
     @GetMapping
     public ResponseEntity<BaseResponse> getAll(){
-        BaseResponse response = service.getAll();
-        return new ResponseEntity<>(response, response.getHttpStatus());
-    }
-
-    @Operation(summary = "Register a user")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "The user has been created",
-                    content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = BaseResponse.class)) }),
-            @ApiResponse(responseCode = "401", description = "The user already exists or you are not authorized",
-                    content = @Content)
-    })
-    @PostMapping("reg")
-    public ResponseEntity<BaseResponse> create(@RequestBody CreateUserRequest request){
-        BaseResponse response = service.create(request);
-        return new ResponseEntity<>(response, response.getHttpStatus());
+        return service.getAll().apply();
     }
 
     @Operation(summary = "Update a user")
@@ -106,8 +90,20 @@ public class UserController {
     @PutMapping("{idUser}")
     public ResponseEntity<BaseResponse> update(@RequestBody UpdateUserRequest request,
                                                @PathVariable Long idUser){
-        BaseResponse response = service.update(request, idUser);
-        return new ResponseEntity<>(response, response.getHttpStatus());
+        return service.update(request, idUser).apply();
+    }
+
+    @Operation(summary = "Register a user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The user has been created",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class)) }),
+            @ApiResponse(responseCode = "401", description = "The user already exists or you are not authorized",
+                    content = @Content)
+    })
+    @PostMapping("sing-up")
+    public ResponseEntity<BaseResponse> create(@RequestBody CreateUserRequest request){
+        return  service.create(request).apply();
     }
 
     @Operation(summary = "Delete a user")
@@ -121,8 +117,8 @@ public class UserController {
 
     @Operation(summary = " Quick check of controller operation")
     @GetMapping("health")
-    public String health() {
-        return "Ok";
+    public ResponseEntity<String> health() {
+        return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 
 }
