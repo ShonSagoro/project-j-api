@@ -15,8 +15,10 @@ import com.estancia.juventudes.services.interfaces.IGuardianService;
 import com.estancia.juventudes.services.interfaces.IUserService;
 import com.estancia.juventudes.utilities.CodeQRUtils;
 import com.google.zxing.WriterException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -32,17 +34,18 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements IUserService {
 
-    private final IGuardianService guardianService;
-    private final IUserRepository repository;
+    @Autowired
+    private IGuardianService guardianService;
 
-    private final GenderTypeConverter converter;
+    @Autowired
+    private IUserRepository repository;
 
+    @Autowired
+    private GenderTypeConverter converter;
 
-    public UserServiceImpl(IGuardianService guardianService, IUserRepository repository, GenderTypeConverter converter) {
-        this.guardianService = guardianService;
-        this.repository = repository;
-        this.converter = converter;
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     @Override
     public BaseResponse get(String email) {
@@ -126,7 +129,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public void verifyAge(User user) {
-        Long age = getAge(user.getId());
+        Long age = getAge(user);
         Boolean status = isValid(age);
         user.setActive(status);
         repository.save(user);
@@ -143,8 +146,7 @@ public class UserServiceImpl implements IUserService {
         return age <= 29;
     }
 
-    public Long getAge(Long id){
-        User user = repository.findById(id).orElseThrow(RuntimeException::new);
+    public Long getAge(User user){
         LocalDate dateOfBirth = LocalDate.parse(user.getDateOfBirth());
         LocalDate todayDate = LocalDate.now();
         return ChronoUnit.YEARS.between(dateOfBirth, todayDate);
@@ -201,7 +203,7 @@ public class UserServiceImpl implements IUserService {
         User user = new User();
         user.setEmail(request.getEmail());
         user.setName(request.getName());
-        user.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setCurp(request.getCurp());
         user.setGender(converter.convertToEntityAttribute(request.getGender()));
         user.setFirstLastname(request.getFirstLastname());
@@ -211,10 +213,8 @@ public class UserServiceImpl implements IUserService {
         user.setNumberPhone(request.getNumberPhone());
         user.setRol(request.getRol());
         user.setActive(true);
-        if(request.getGuardianId()!=0){
-            Guardian guardian= guardianService.getById(request.getGuardianId());
-            user.setGuardian(guardian);
-        }
+        Guardian guardian = request.getGuardianId()!= null? guardianService.getById(request.getGuardianId()):null;
+        user.setGuardian(guardian);
         return user;
     }
 
@@ -242,11 +242,9 @@ public class UserServiceImpl implements IUserService {
     }
 
     private boolean existCurp (String curp) {
-
         String search = "^[A-Z]{4}\\d{6}[H|M][A-Z]{5}[A-Z0-9]{2}$";
         Pattern patron = Pattern.compile(search);
         Matcher verify = patron.matcher(curp);
-
         return verify.matches();
     }
 
