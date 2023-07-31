@@ -1,12 +1,15 @@
 package com.estancia.juventudes.controllers;
 
 import com.estancia.juventudes.controllers.dtos.response.BaseResponse;
+import com.estancia.juventudes.services.GoogleDriveServiceImpl;
+import com.estancia.juventudes.services.interfaces.IGoogleDriveService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,11 +24,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 @RequestMapping("file")
 public class FileController {
+
+    @Autowired
+    private IGoogleDriveService service;
 
     @Value("${upload.path}")
     private String uploadPath;
@@ -72,6 +82,40 @@ public class FileController {
 
         return ResponseEntity.ok().headers(responseHeaders).body(fileContent);
     }
+
+
+
+    @PostMapping(value = "/upload/drive",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE} )
+    public ResponseEntity<String> uploadSingleFile(@RequestBody MultipartFile[] files,@RequestParam(required = false) String path) {
+        int filesize = files.length;
+        AtomicReference<String> fileId = new AtomicReference<>("");
+        AtomicReference<String> fileName = new AtomicReference<>("");
+        Arrays.asList(files).forEach(
+                file->{
+                    fileId.set(service.uploadFile(file, path));
+                    fileName.set(file.getOriginalFilename());
+                }
+        );
+
+        if (filesize > 1){
+            return ResponseEntity.ok("files uploaded successfully");
+        }
+        return ResponseEntity.ok(fileName + ", uploaded successfully");
+    }
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<BaseResponse> download(@PathVariable String id, HttpServletResponse response) throws IOException, GeneralSecurityException {
+        return service.downloadFile(id, response.getOutputStream()).apply();
+    }
+
+
+    @GetMapping("/list")
+    public ResponseEntity<BaseResponse> listEverything() throws IOException, GeneralSecurityException {
+        return service.listEverything().apply();
+    }
+
 
     @Operation(summary = " Quick check of controller operation")
     @GetMapping("health")

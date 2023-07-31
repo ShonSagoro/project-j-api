@@ -23,12 +23,7 @@ import java.awt.image.BufferedImage;
 public class UserController {
 
     @Autowired
-    private final IUserService service;
-
-    public UserController(IUserService service){
-        this.service = service;
-    }
-
+    private IUserService service;
 
     @Operation(summary = "Get the code qr by user curp")
     @ApiResponses(value = {
